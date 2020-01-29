@@ -11,6 +11,7 @@ Install-Module -Name ComputerManagementDsc
 Install-Module -Name "xFailOverCluster"
 Install-Module -Name PSDscResources
 Install-Module -Name xSmbShare
+Install-Module -Name StorageDsc
 Install-Module -Name "xActiveDirectory"
 Install-Module SqlServer -Force -AllowClobber
 
@@ -18,7 +19,7 @@ Install-Module SqlServer -Force -AllowClobber
 Get-NetFirewallProfile | Set-NetFirewallProfile -Enabled False
 
 "Creating Directory for DSC Public Cert"
-New-Item -Path C:\AWSQuickstart\publickeys -ItemType directory 
+New-Item -Path C:\AWSQuickstart\publickeys -ItemType directory -Force
 
 "Setting up DSC Certificate to Encrypt Credentials in MOF File"
 $cert = New-SelfSignedCertificate -Type DocumentEncryptionCertLegacyCsp -DnsName 'AWSQSDscEncryptCert' -HashAlgorithm SHA256
