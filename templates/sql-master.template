@@ -422,7 +422,7 @@ Parameters:
     Description: SQL Server 2017 installation media location
     Type: String
   SQL2019Media:
-    Default: Enter a URL here
+    Default: https://go.microsoft.com/fwlink/?linkid=866664
     Description: SQL Server 2019 installation media location
     Type: String
   SQLLicenseProvided:
