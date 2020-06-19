@@ -6,7 +6,7 @@ Install-PackageProvider -Name NuGet -MinimumVersion 2.8.5.201 -Force
 Set-PSRepository -Name PSGallery -InstallationPolicy Trusted
 
 "Installing the needed Powershell DSC modules for this Quick Start"
-Install-Module -Name SqlServerDsc
+Install-Module -Name SqlServerDsc -RequiredVersion 13.5.0
 Install-Module -Name ComputerManagementDsc
 Install-Module -Name "xFailOverCluster"
 Install-Module -Name PSDscResources
