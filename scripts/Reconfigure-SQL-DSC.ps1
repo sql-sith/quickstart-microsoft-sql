@@ -51,11 +51,11 @@ Configuration ReconfigureSQL {
     )
 
     Import-Module -Name PSDesiredStateConfiguration
-    Import-Module -Name SqlServerDsc
+    Import-Module -Name SqlServerDsc -RequiredVersion 13.5.0
     Import-Module SQLPS
 
     Import-DscResource -Module PSDesiredStateConfiguration
-    Import-DscResource -Module SqlServerDsc
+    Import-DscResource -Module SqlServerDsc -ModuleVersion 13.5.0
 
     Node $AllNodes.NodeName {
         SqlServerLogin 'AddSQLAdmin' {
