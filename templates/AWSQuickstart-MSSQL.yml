@@ -480,6 +480,7 @@ mainSteps:
 - name: "Node2Config"
   action: aws:runCommand
   onFailure: "step:signalfailure"
+  nextStep: SqlInstallBranch
   inputs:
     DocumentName: AWS-RunPowerShellScript
     InstanceIds: 
@@ -818,7 +819,7 @@ mainSteps:
 - name: "2NodeNoMadPrimaryCreateAGConfig"
   action: aws:runCommand
   onFailure: "step:signalfailure"
-  nextStep: "AdditionalCreateAGBranch"
+  nextStep: "2NodeAdditionalCreateAG"
   inputs:
     DocumentName: AWS-RunPowerShellScript
     InstanceIds: 
@@ -859,7 +860,7 @@ mainSteps:
 - name: "2NodeMadPrimaryCreateAGConfig"
   action: aws:runCommand
   onFailure: "step:signalfailure"
-  nextStep: "AdditionalCreateAGBranch"
+  nextStep: "2NodeAdditionalCreateAG"
   inputs:
     DocumentName: AWS-RunPowerShellScript
     InstanceIds: 
@@ -870,19 +871,19 @@ mainSteps:
     Parameters:
       commands: 
         - |     
-           function DscStatusCheck () {
-               $LCMState = (Get-DscLocalConfigurationManager).LCMState
-               if ($LCMState -eq 'PendingConfiguration' -Or $LCMState -eq 'PendingReboot') {
-                   'returning 3010, should continue after reboot'
-                   exit 3010
-               } else {
-                 'Completed'
-               }
-           }
-           
-           Start-DscConfiguration 'C:\AWSQuickstart\AddAG' -Wait -Verbose -Force
+          function DscStatusCheck () {
+              $LCMState = (Get-DscLocalConfigurationManager).LCMState
+              if ($LCMState -eq 'PendingConfiguration' -Or $LCMState -eq 'PendingReboot') {
+                  'returning 3010, should continue after reboot'
+                  exit 3010
+              } else {
+                'Completed'
+              }
+          }
+          
+          Start-DscConfiguration 'C:\AWSQuickstart\AddAG' -Wait -Verbose -Force
 
-           DscStatusCheck
+          DscStatusCheck
 - name: "3NodeNoMadPrimaryCreateAG"
   action: "aws:runCommand"
   onFailure: "step:signalfailure"
@@ -911,19 +912,19 @@ mainSteps:
     Parameters:
       commands: 
         - |     
-           function DscStatusCheck () {
-               $LCMState = (Get-DscLocalConfigurationManager).LCMState
-               if ($LCMState -eq 'PendingConfiguration' -Or $LCMState -eq 'PendingReboot') {
-                   'returning 3010, should continue after reboot'
-                   exit 3010
-               } else {
-                 'Completed'
-               }
-           }
-           
-           Start-DscConfiguration 'C:\AWSQuickstart\AddAG' -Wait -Verbose -Force
+          function DscStatusCheck () {
+              $LCMState = (Get-DscLocalConfigurationManager).LCMState
+              if ($LCMState -eq 'PendingConfiguration' -Or $LCMState -eq 'PendingReboot') {
+                  'returning 3010, should continue after reboot'
+                  exit 3010
+              } else {
+                'Completed'
+              }
+          }
+          
+          Start-DscConfiguration 'C:\AWSQuickstart\AddAG' -Wait -Verbose -Force
 
-           DscStatusCheck
+          DscStatusCheck
 - name: "3NodeMadPrimaryCreateAG"
   action: "aws:runCommand"
   onFailure: "step:signalfailure"
@@ -951,19 +952,19 @@ mainSteps:
     Parameters:
       commands: 
         - |     
-           function DscStatusCheck () {
-               $LCMState = (Get-DscLocalConfigurationManager).LCMState
-               if ($LCMState -eq 'PendingConfiguration' -Or $LCMState -eq 'PendingReboot') {
-                   'returning 3010, should continue after reboot'
-                   exit 3010
-               } else {
-                 'Completed'
-               }
-           }
-           
-           Start-DscConfiguration 'C:\AWSQuickstart\AddAG' -Wait -Verbose -Force
+          function DscStatusCheck () {
+              $LCMState = (Get-DscLocalConfigurationManager).LCMState
+              if ($LCMState -eq 'PendingConfiguration' -Or $LCMState -eq 'PendingReboot') {
+                  'returning 3010, should continue after reboot'
+                  exit 3010
+              } else {
+                'Completed'
+              }
+          }
+          
+          Start-DscConfiguration 'C:\AWSQuickstart\AddAG' -Wait -Verbose -Force
 
-           DscStatusCheck
+          DscStatusCheck
 - name: AdditionalCreateAGBranch
   action: aws:branch
   inputs:
@@ -1005,19 +1006,19 @@ mainSteps:
     Parameters:
       commands: 
         - |     
-           function DscStatusCheck () {
-               $LCMState = (Get-DscLocalConfigurationManager).LCMState
-               if ($LCMState -eq 'PendingConfiguration' -Or $LCMState -eq 'PendingReboot') {
-                   'returning 3010, should continue after reboot'
-                   exit 3010
-               } else {
-                 'Completed'
-               }
-           }
-           
-           Start-DscConfiguration 'C:\AWSQuickstart\AddAG' -Wait -Verbose -Force
+          function DscStatusCheck () {
+              $LCMState = (Get-DscLocalConfigurationManager).LCMState
+              if ($LCMState -eq 'PendingConfiguration' -Or $LCMState -eq 'PendingReboot') {
+                  'returning 3010, should continue after reboot'
+                  exit 3010
+              } else {
+                'Completed'
+              }
+          }
+          
+          Start-DscConfiguration 'C:\AWSQuickstart\AddAG' -Wait -Verbose -Force
 
-           DscStatusCheck
+          DscStatusCheck
 - name: "3NodeAdditionalCreateAG"
   action: "aws:runCommand"
   onFailure: "step:signalfailure"
@@ -1047,19 +1048,19 @@ mainSteps:
     Parameters:
       commands: 
         - |     
-           function DscStatusCheck () {
-               $LCMState = (Get-DscLocalConfigurationManager).LCMState
-               if ($LCMState -eq 'PendingConfiguration' -Or $LCMState -eq 'PendingReboot') {
-                   'returning 3010, should continue after reboot'
-                   exit 3010
-               } else {
-                 'Completed'
-               }
-           }
-           
-           Start-DscConfiguration 'C:\AWSQuickstart\AddAG' -Wait -Verbose -Force
+          function DscStatusCheck () {
+              $LCMState = (Get-DscLocalConfigurationManager).LCMState
+              if ($LCMState -eq 'PendingConfiguration' -Or $LCMState -eq 'PendingReboot') {
+                  'returning 3010, should continue after reboot'
+                  exit 3010
+              } else {
+                'Completed'
+              }
+          }
+          
+          Start-DscConfiguration 'C:\AWSQuickstart\AddAG' -Wait -Verbose -Force
 
-           DscStatusCheck
+          DscStatusCheck
 # Determines if CFN Needs to be Signaled or if Work flow should just end
 - name: CFNSignalEnd
   action: aws:branch
@@ -1091,11 +1092,11 @@ mainSteps:
     Duration: PT1S
 # If any steps fails signals CFN of Failure
 - name: "signalfailure"
-  action: "aws:executeAwsApi"
-  inputs:
-    Service: cloudformation
-    Api: SignalResource
-    LogicalResourceId: "SSMWaitCondition"
-    StackName: "{{StackName}}"
-    Status: FAILURE
-    UniqueId: "{{wsfcNode2InstanceId.InstanceId}}"
+action: "aws:executeAwsApi"
+inputs:
+  Service: cloudformation
+  Api: SignalResource
+  LogicalResourceId: "SSMWaitCondition"
+  StackName: "{{StackName}}"
+  Status: FAILURE
+  UniqueId: "{{wsfcNode2InstanceId.InstanceId}}"
