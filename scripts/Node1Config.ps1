@@ -61,11 +61,11 @@ Configuration WSFCNode1Config {
 
     Import-Module -Name PSDscResources
     Import-Module -Name xFailOverCluster
-    Import-Module -Name xActiveDirectory
+    Import-Module -Name ActiveDirectoryDsc
     
     Import-DscResource -Module PSDscResources
     Import-DscResource -ModuleName xFailOverCluster
-    Import-DscResource -ModuleName xActiveDirectory
+    Import-DscResource -ModuleName ActiveDirectoryDsc
     
     Node 'localhost' {
         WindowsFeature RSAT-AD-PowerShell {
@@ -97,13 +97,13 @@ Configuration WSFCNode1Config {
             DependsOn = '[WindowsFeature]AddRemoteServerAdministrationToolsClusteringPowerShellFeature'
         }
         
-        xADUser SQLServiceAccount {
+        ADUser SQLServiceAccount {
             DomainName = $DomainDnsName
             UserName = $SQLUser.UserName
             Password = $SQLCredentials
             DisplayName = $SQLUser.UserName
             PasswordAuthentication = 'Negotiate'
-            DomainAdministratorCredential = $Credentials
+            PsDscRunAsCredential = $Credentials
             Ensure = 'Present'
             DependsOn = '[WindowsFeature]AddRemoteServerAdministrationToolsClusteringCmdInterfaceFeature' 
         }
@@ -112,7 +112,7 @@ Configuration WSFCNode1Config {
             GroupName = 'Administrators'
             Ensure = 'Present'
             MembersToInclude = @($ClusterAdminUser, $SQLAdminUser)
-            DependsOn = "[xADUser]SQLServiceAccount"
+            DependsOn = "[ADUser]SQLServiceAccount"
         }
 
         xCluster CreateCluster {
