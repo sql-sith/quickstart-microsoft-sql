@@ -157,15 +157,15 @@ Configuration AddAG {
     )
 
     Import-Module -Name PSDesiredStateConfiguration
-    Import-Module -Name xActiveDirectory
+    Import-Module -Name ActiveDirectoryDsc
     Import-Module -Name SqlServerDsc
     
     Import-DscResource -Module PSDesiredStateConfiguration
-    Import-DscResource -Module xActiveDirectory
+    Import-DscResource -Module ActiveDirectoryDsc
     Import-DscResource -Module SqlServerDsc
 
     Node $AllNodes.NodeName {
-        SqlServerMaxDop 'SQLServerMaxDopAuto' {
+        SqlMaxDop 'SQLServerMaxDopAuto' {
             Ensure                  = 'Present'
             DynamicAlloc            = $true
             ServerName              = $NetBIOSName
@@ -174,7 +174,7 @@ Configuration AddAG {
             ProcessOnlyOnActiveNode = $true
         }
 
-        SqlServerConfiguration 'SQLConfigPriorityBoost'{
+        SqlConfiguration 'SQLConfigPriorityBoost'{
             ServerName     = $NetBIOSName
             InstanceName   = 'MSSQLSERVER'
             OptionName     = 'cost threshold for parallelism'
@@ -188,7 +188,7 @@ Configuration AddAG {
             PsDscRunAsCredential = $SQLCredentials
         }
 
-        SqlServerLogin 'AddNTServiceClusSvc' {
+        SqlLogin 'AddNTServiceClusSvc' {
             Ensure               = 'Present'
             Name                 = 'NT SERVICE\ClusSvc'
             LoginType            = 'WindowsUser'
@@ -197,8 +197,8 @@ Configuration AddAG {
             PsDscRunAsCredential = $SQLCredentials
         }
 
-        SqlServerPermission 'AddNTServiceClusSvcPermissions' {
-            DependsOn            = '[SqlServerLogin]AddNTServiceClusSvc'
+        SqlPermission 'AddNTServiceClusSvcPermissions' {
+            DependsOn            = '[SqlLogin]AddNTServiceClusSvc'
             Ensure               = 'Present'
             ServerName           = $NetBIOSName
             InstanceName         = 'MSSQLSERVER'
@@ -207,8 +207,9 @@ Configuration AddAG {
             PsDscRunAsCredential = $SQLCredentials
         }
 
-        SqlServerEndpoint 'HADREndpoint' {
+        SqlEndpoint 'HADREndpoint' {
             EndPointName         = 'HADR'
+            EndpointType         = 'DatabaseMirroring'
             Ensure               = 'Present'
             Port                 = 5022
             ServerName           = $NetBIOSName
@@ -222,7 +223,7 @@ Configuration AddAG {
                 Ensure = 'Present'
             }
 
-            xADObjectPermissionEntry 'ADObjectPermissionEntry' {
+            ADObjectPermissionEntry 'ADObjectPermissionEntry' {
                 Ensure                             = 'Present'
                 Path                               = $OUPath
                 IdentityReference                  = $IdentityReference
@@ -242,7 +243,7 @@ Configuration AddAG {
             ServerName           = $NetBIOSName
             AvailabilityMode     = 'SynchronousCommit'
             FailoverMode         = 'Automatic'
-            DependsOn = '[SqlAlwaysOnService]EnableAlwaysOn', '[SqlServerEndpoint]HADREndpoint', '[SqlServerPermission]AddNTServiceClusSvcPermissions'
+            DependsOn = '[SqlAlwaysOnService]EnableAlwaysOn', '[SqlEndpoint]HADREndpoint', '[SqlPermission]AddNTServiceClusSvcPermissions'
             PsDscRunAsCredential = $SQLCredentials
         }
 
