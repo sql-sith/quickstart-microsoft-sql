@@ -6,14 +6,14 @@ Install-PackageProvider -Name NuGet -MinimumVersion 2.8.5.201 -Force
 Set-PSRepository -Name PSGallery -InstallationPolicy Trusted
 
 "Installing the needed Powershell DSC modules for this Quick Start"
-Install-Module -Name SqlServerDsc -RequiredVersion 13.5.0
-Install-Module -Name ComputerManagementDsc
-Install-Module -Name "xFailOverCluster"
-Install-Module -Name PSDscResources
-Install-Module -Name xSmbShare
-Install-Module -Name StorageDsc
-Install-Module -Name "xActiveDirectory"
-Install-Module SqlServer -Force -AllowClobber
+Install-Module -Name SqlServerDsc -RequiredVersion 14.2.1
+Install-Module -Name ComputerManagementDsc -RequiredVersion 8.4.0
+Install-Module -Name xFailOverCluster -RequiredVersion 1.14.1
+Install-Module -Name PSDscResources -RequiredVersion 2.12.0.0
+Install-Module -Name xSmbShare -RequiredVersion 2.2.0.0
+Install-Module -Name StorageDsc -RequiredVersion 5.0.1
+Install-Module -Name ActiveDirectoryDsc -RequiredVersion 6.0.1
+Install-Module SqlServer -Force -AllowClobber -RequiredVersion 21.1.18226
 
 "Disabling Windows Firewall"
 Get-NetFirewallProfile | Set-NetFirewallProfile -Enabled False

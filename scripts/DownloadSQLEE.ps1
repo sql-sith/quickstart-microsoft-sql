@@ -1,4 +1,4 @@
-﻿[CmdletBinding()]
+[CmdletBinding()]
 
 param(
 
@@ -38,13 +38,31 @@ try {
     }
     else {
         $source = $SQL2019Media
+        $DestPathExe = "C:\SQLMedia\SQL2019-SSEI-Eval.exe"
     }
 
     $tries = 5
     while ($tries -ge 1) {
         try {
-            Start-BitsTransfer -Source $source -Destination "$DestPath" -ErrorAction Stop
+            if ( ($Source.Substring($source.Length-4) -eq ".exe") -or ($Source.Substring($source.Length-4) -eq ".iso") )
+                { Start-BitsTransfer -Source $source -Destination "$DestPath"  -ErrorAction Stop } 
+            else { 
+                Start-BitsTransfer -Source $source -Destination "$DestPathExe"  -ErrorAction Stop
+
+                if ($SQLServerVersion -eq "2019") { 
+                    C:\SQLMedia\SQL2019-SSEI-Eval.exe /ACTION=DOWNLOAD /MEDIATYPE=ISO /MEDIAPATH=C:\SQLMedia /Quiet /HideProgressBar
+                }
+
+                $Timeout = 600
+                $timer = [Diagnostics.Stopwatch]::StartNew()
+                while (($timer.Elapsed.TotalSeconds -lt $Timeout) -and (-not (Test-Path "C:\SQLMedia\SQLServer$SQLServerVersion-x64-ENU.iso"))) {
+                    Start-Sleep -Seconds 20
+                }
+                $timer.Stop()
+            }
+
             Start-BitsTransfer -Source $ssmssource -Destination "$DestPath" -ErrorAction Stop
+           
             break
         } 
         catch {
@@ -64,3 +82,4 @@ try {
 catch {
     Write-Verbose "$($_.exception.message)@ $(Get-Date)"
 }
+

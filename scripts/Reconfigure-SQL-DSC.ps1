@@ -29,13 +29,13 @@ $NetBIOSName = $NameTag.Value
 $ConfigurationData = @{
     AllNodes = @(
         @{
-            NodeName     = '*'
+            #NodeName     = '*'
             CertificateFile = "C:\AWSQuickstart\publickeys\AWSQSDscPublicKey.cer"
             Thumbprint = $DscCertThumbprint
             PSDscAllowDomainUser = $true
         },
         @{
-            NodeName = 'localhost'
+            #NodeName = 'localhost'
         }
     )
 }
@@ -58,7 +58,7 @@ Configuration ReconfigureSQL {
     Import-DscResource -Module SqlServerDsc -ModuleVersion 13.5.0
 
     Node $AllNodes.NodeName {
-        SqlServerLogin 'AddSQLAdmin' {
+        SqlLogin 'AddSQLAdmin' {
             Ensure               = 'Present'
             Name                 = $SQLAdminUser
             LoginType            = 'WindowsUser'
@@ -66,7 +66,7 @@ Configuration ReconfigureSQL {
             InstanceName         = 'MSSQLSERVER'
         }
 
-        SqlServerLogin 'AddDomainAdmin' {
+        SqlLogin 'AddDomainAdmin' {
             Ensure               = 'Present'
             Name                 = $DomainAdminUser
             LoginType            = 'WindowsUser'
@@ -74,13 +74,13 @@ Configuration ReconfigureSQL {
             InstanceName         = 'MSSQLSERVER'
         }
 
-        SqlServerRole 'AddSysadminUsers' {
+        SqlRole 'AddSysadminUsers' {
             Ensure               = 'Present'
             ServerRoleName       = 'sysadmin'
             MembersToInclude     = $DomainAdminUser, $SQLAdminUser
             ServerName           = $NetBIOSName
             InstanceName         = 'MSSQLSERVER'
-            DependsOn            = '[SqlServerLogin]AddDomainAdmin', '[SqlServerLogin]AddSQLAdmin'
+            DependsOn            = '[SqlLogin]AddDomainAdmin', '[SqlLogin]AddSQLAdmin'
         }
 
         SqlServiceAccount 'SetSQLServerAgentUser' {
@@ -128,7 +128,7 @@ Configuration ReconfigureSQL {
             Type                    = 'Data'
             Path                    = 'D:\MSSQL\DATA'
             PsDscRunAsCredential    = $SQLCredentials
-            DependsOn               = '[SqlServerRole]AddSysadminUsers', '[File]SQLDataFolder'
+            DependsOn               = '[SqlRole]AddSysadminUsers', '[File]SQLDataFolder'
         }
 
         SqlDatabaseDefaultLocation 'SqlDatabaseDefaultLogDirectory' {
@@ -138,7 +138,7 @@ Configuration ReconfigureSQL {
             Type                    = 'Log'
             Path                    = 'E:\MSSQL\LOG'
             PsDscRunAsCredential    = $SQLCredentials
-            DependsOn               = '[SqlServerRole]AddSysadminUsers', '[File]SQLLogFolder'
+            DependsOn               = '[SqlRole]AddSysadminUsers', '[File]SQLLogFolder'
         }
 
         SqlDatabaseDefaultLocation 'SqlDatabaseDefaultBackupDirectory' {
@@ -183,7 +183,8 @@ Configuration ReconfigureSQL {
         }
 
         SqlScriptQuery 'UpdatePathTempDB' {
-            ServerInstance = 'localhost'
+            ServerName        = $env:COMPUTERNAME
+            InstanceName      = 'MSSQLSERVER'
             SetQuery       = "USE master; ALTER DATABASE tempdb MODIFY FILE (NAME = tempdev, FILENAME = 'F:\MSSQL\TempDB\tempdb.mdf'); ALTER DATABASE tempdb MODIFY FILE (NAME = templog, FILENAME = 'F:\MSSQL\TempDB\templog.ldf');"
             TestQuery      = "IF NOT EXISTS (SELECT name FROM sys.master_files WHERE physical_name='F:\MSSQL\TempDB\tempdb.mdf' OR physical_name='F:\MSSQL\TempDB\templog.ldf')
             BEGIN
@@ -194,12 +195,13 @@ Configuration ReconfigureSQL {
                 PRINT 'Database Location is set correctly'
             END"
             GetQuery       = "SELECT physical_name FROM sys.master_files WHERE name='tempdev' OR name='templog';"
-            PsDscRunAsCredential = $SQLCredentials
-            DependsOn            = '[SqlServerRole]AddSysadminUsers'
+            Credential = $SQLCredentials
+            DependsOn            = '[SqlRole]AddSysadminUsers'
         }
 
         SqlScriptQuery 'UpdatePathModel' {
-            ServerInstance = 'localhost'
+            ServerName        = $env:COMPUTERNAME
+            InstanceName      = 'MSSQLSERVER'
             SetQuery       = "USE master; ALTER DATABASE model MODIFY FILE (NAME = modeldev, FILENAME = 'D:\MSSQL\DATA\model.mdf'); ALTER DATABASE model MODIFY FILE (NAME = modellog, FILENAME = 'E:\MSSQL\LOG\modellog.ldf');"
             TestQuery      = "IF NOT EXISTS (SELECT name FROM sys.master_files WHERE physical_name='D:\MSSQL\DATA\model.mdf' OR physical_name='E:\MSSQL\LOG\modellog.ldf')
             BEGIN
@@ -210,12 +212,13 @@ Configuration ReconfigureSQL {
                 PRINT 'Database Location is set correctly'
             END"
             GetQuery       = "SELECT physical_name FROM sys.master_files WHERE name='modeldev' OR name='modellog';"
-            PsDscRunAsCredential = $SQLCredentials
-            DependsOn            = '[SqlServerRole]AddSysadminUsers'
+            Credential = $SQLCredentials
+            DependsOn            = '[SqlRole]AddSysadminUsers'
         }
 
         SqlScriptQuery 'UpdatePathMSDB' {
-            ServerInstance = 'localhost'
+            ServerName        = $env:COMPUTERNAME
+            InstanceName      = 'MSSQLSERVER'
             SetQuery       = "USE master; ALTER DATABASE MSDB MODIFY FILE (NAME = MSDBData, FILENAME = 'D:\MSSQL\DATA\MSDBData.mdf'); ALTER DATABASE MSDB MODIFY FILE (NAME = MSDBLog, FILENAME = 'E:\MSSQL\LOG\MSDBLog.ldf');"
             TestQuery      = "IF NOT EXISTS (SELECT name FROM sys.master_files WHERE physical_name='D:\MSSQL\DATA\MSDBData.mdf' OR physical_name='E:\MSSQL\LOG\MSDBLog.ldf')
             BEGIN
@@ -226,8 +229,8 @@ Configuration ReconfigureSQL {
                 PRINT 'Database Location is set correctly'
             END"
             GetQuery       = "SELECT physical_name FROM sys.master_files WHERE name='MSDBData' OR name='MSDBLog';"
-            PsDscRunAsCredential = $SQLCredentials
-            DependsOn            = '[SqlServerRole]AddSysadminUsers'
+            Credential = $SQLCredentials
+            DependsOn            = '[SqlRole]AddSysadminUsers'
         }
 
         Script MoveDBFiles {
